@@ -1,11 +1,8 @@
 #include <IRremote.h>
+#include "util/crc16.h"
 
 const int irSend = 9;
 const int irRecv = 8;
-
-const uint16_t shotArray[] = {
-  0xAA, 0x24
-};
 
 void setup() {
   Serial.begin(9600);
@@ -14,14 +11,18 @@ void setup() {
 }
 
 void loop() {
-  for(int i = 0; i < sizeof(shotArray) / sizeof(uint16_t); i++) {
-    IrSender.sendNECRaw(shotArray[i]);
-    delay(50);
-  }
+  IrSender.sendNECRaw(generatePacket(0xAA));
 
   if (IrReceiver.decode()) {
     Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
     IrReceiver.resume(); // Prepare to receive the next value
   }
   delay(1000);
+}
+
+uint16_t generatePacket(uint8_t playerId) {
+  uint8_t crc;
+  crc = _crc8_ccitt_update(crc, playerId);
+  uint16_t packet = (playerId << 8) | crc;
+  return packet;
 }
