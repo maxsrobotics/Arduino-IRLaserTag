@@ -5,6 +5,10 @@
 const int irSend = 9;
 const int irRecv = 8;
 
+int shotArray[] = {
+  0xAA, 0x24
+};
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -15,10 +19,11 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  IrSender.sendNECRaw(0xAA, 0);
+  IrSender.sendNECRaw(shotArray, 0);
 
   if(IrReceiver.decode()) {
-    Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
+    //Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
+    IrReceiver.printIRResultShort(&Serial);
   }
   delay(1000);
 }
